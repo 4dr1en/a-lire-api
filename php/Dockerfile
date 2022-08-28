@@ -9,7 +9,6 @@ RUN apt-get update \
     && docker-php-ext-install zip
 
 # Install dependencies for using postgresql
-RUN docker-php-ext-install pdo 
 RUN apt-get install -y libpq-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql
