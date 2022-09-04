@@ -3,7 +3,7 @@ doctrine:
         #url: '%env(resolve:DATABASE_URL)%'
         dbname: lis-moi
         user: postgres
-        password: postgres
+        password: '%env(resolve:DATABASE_PASSWORD)%' # This is the password of the user postgres
         host: database
         port: 5432
         driver: 'pdo_pgsql'
