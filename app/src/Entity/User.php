@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,6 +30,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255)]
     private $email;
+
+    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Flux::class)]
+    private $createdFluxes;
+
+    public function __construct()
+    {
+        $this->createdFluxes = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -107,6 +117,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Flux>
+     */
+    public function getCreatedFluxes(): Collection
+    {
+        return $this->createdFluxes;
+    }
+
+    public function addCreatedFlux(Flux $createdFlux): self
+    {
+        if (!$this->createdFluxes->contains($createdFlux)) {
+            $this->createdFluxes[] = $createdFlux;
+            $createdFlux->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedFlux(Flux $createdFlux): self
+    {
+        if ($this->createdFluxes->removeElement($createdFlux)) {
+            // set the owning side to null (unless already changed)
+            if ($createdFlux->getCreatedBy() === $this) {
+                $createdFlux->setCreatedBy(null);
+            }
+        }
 
         return $this;
     }
