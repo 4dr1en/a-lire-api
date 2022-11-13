@@ -2,68 +2,53 @@
 
 namespace App\Entity;
 
-use App\Entity\Flux;
+use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity('email', message: 'This email is already used')]
-#[UniqueEntity('pseudo', message: 'This pseudo is already used')]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    #[ORM\GeneratedValue(strategy: 'UUID')]
-    #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
-    private string $id;
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
 
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Assert\Length(
-        min: 3,
-        max: 180,
-        minMessage: 'Your username must be at least {{ limit }} characters long',
-        maxMessage: 'Your username cannot be longer than {{ limit }} characters'
-    )]
-    private $pseudo;
+    #[ORM\Column(length: 180, unique: true)]
+    private ?string $username = null;
 
-    #[ORM\Column(type: 'json')]
-    private $roles = [];
+    #[ORM\Column]
+    private array $roles = [];
 
-    #[ORM\Column(type: 'string')]
-    private $password;
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\Email]
-    private $email;
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
 
-    #[ORM\OneToMany(mappedBy: 'createdBy', targetEntity: Flux::class)]
-    private $createdFluxes;
-
-    public function __construct()
-    {
-        $this->createdFluxes = new ArrayCollection();
-    }
-
-    public function getId(): ?string
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
 
-    public function getPseudo(): ?string
+    public function getUsername(): ?string
     {
-        return $this->pseudo;
+        return $this->username;
     }
 
-    public function setPseudo(string $pseudo): self
+    public function setUsername(string $username): self
     {
-        $this->pseudo = $pseudo;
+        $this->username = $username;
 
         return $this;
     }
@@ -75,7 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->pseudo;
+        return (string) $this->username;
     }
 
     /**
@@ -129,36 +114,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Flux>
-     */
-    public function getCreatedFluxes(): Collection
-    {
-        return $this->createdFluxes;
-    }
-
-    public function addCreatedFlux(Flux $createdFlux): self
-    {
-        if (!$this->createdFluxes->contains($createdFlux)) {
-            $this->createdFluxes[] = $createdFlux;
-            $createdFlux->setCreatedBy($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCreatedFlux(Flux $createdFlux): self
-    {
-        if ($this->createdFluxes->removeElement($createdFlux)) {
-            // set the owning side to null (unless already changed)
-            if ($createdFlux->getCreatedBy() === $this) {
-                $createdFlux->setCreatedBy(null);
-            }
-        }
 
         return $this;
     }

@@ -26,7 +26,7 @@ class RegistrationController extends AbstractController
 		$req = json_decode($request->getContent(), true);
 
 		$user = new User();
-		$user->setPseudo($req['pseudo']);
+		$user->setUsername($req['username']);
 		$user->setEmail($req['email']);
 		$user->setPassword($passwordHasher->hashPassword(
 			$user,
