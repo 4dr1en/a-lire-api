@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
@@ -23,6 +25,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\Length(
+        min: 3,
+        max: 180,
+        minMessage: 'Your username must be at least {{ limit }} characters long',
+        maxMessage: 'Your username cannot be longer than {{ limit }} characters'
+    )]
     private ?string $username = null;
 
     #[ORM\Column]
@@ -35,7 +43,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Email]
     private ?string $email = null;
+
+    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Flux::class)]
+    private Collection $created_fluxes;
+
+    public function __construct()
+    {
+        $this->created_fluxes = new ArrayCollection();
+    }
 
     public function getId(): ?Uuid
     {
@@ -115,6 +132,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Flux>
+     */
+    public function getCreatedFluxes(): Collection
+    {
+        return $this->created_fluxes;
+    }
+
+    public function addCreatedFlux(Flux $createdFlux): self
+    {
+        if (!$this->created_fluxes->contains($createdFlux)) {
+            $this->created_fluxes->add($createdFlux);
+            $createdFlux->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedFlux(Flux $createdFlux): self
+    {
+        if ($this->created_fluxes->removeElement($createdFlux)) {
+            // set the owning side to null (unless already changed)
+            if ($createdFlux->getCreatedBy() === $this) {
+                $createdFlux->setCreatedBy(null);
+            }
+        }
 
         return $this;
     }
