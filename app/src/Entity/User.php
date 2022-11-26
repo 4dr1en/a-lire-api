@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -22,6 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[Groups('user:light')]
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -31,9 +33,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         minMessage: 'Your username must be at least {{ limit }} characters long',
         maxMessage: 'Your username cannot be longer than {{ limit }} characters'
     )]
+    #[Groups('user:light')]
     private ?string $username = null;
 
     #[ORM\Column]
+    #[Groups('user:full')]
     private array $roles = [];
 
     /**
@@ -44,9 +48,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\Email]
+    #[Groups('user:light')]
     private ?string $email = null;
 
     #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Flux::class)]
+    #[Groups('user:full')]
     private Collection $created_fluxes;
 
     public function __construct()

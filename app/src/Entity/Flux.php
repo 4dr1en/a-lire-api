@@ -5,8 +5,9 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FluxRepository;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: FluxRepository::class)]
 #[UniqueEntity(fields: 'title', message: 'There is already an flux with this title')]
@@ -16,6 +17,7 @@ class Flux
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('flux:light')]
     private ?int $id = null;
 
     #[Assert\NotBlank]
@@ -26,6 +28,7 @@ class Flux
         maxMessage: 'The title cannot be longer than {{ limit }} characters'
     )]
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups('flux:light')]
     private ?string $title = null;
 
     #[Assert\Length(
@@ -33,21 +36,26 @@ class Flux
         maxMessage: 'The description cannot be longer than {{ limit }} characters'
     )]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups('flux:light')]
     private ?string $description = null;
 
     #[Assert\Type("\DateTimeInterface")]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Groups('flux:full')]
     private ?\DateTimeImmutable $created_at = null;
 
     #[Assert\Type("\DateTimeInterface")]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Groups('flux:full')]
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'created_fluxes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('flux:full')]
     private ?User $created_by = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups('flux:light')]
     private ?string $slug = null;
 
     public function getId(): ?int

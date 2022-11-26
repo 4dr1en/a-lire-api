@@ -8,21 +8,36 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\String\Slugger\AsciiSlugger;
-
 
 class UserFluxesController extends AbstractController
 {
-    #[Route('/user/fluxes', name: 'app_user_fluxes')]
+    #[IsGranted('ROLE_USER')]
+    #[Route('/user/created_fluxes', name: 'app_user_created_fluxes', methods: ['GET'])]
     public function index(): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserFluxesController.php',
-        ]);
+        $user = $this->getUser();
+        $fluxes = $user->getCreatedFluxes();
+
+        // return the flux in json format
+        return $this->json(
+            [
+                'user' => $user,
+                'fluxes' => $fluxes,
+            ],
+            Response::HTTP_OK,
+            [],
+            [
+                ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                    return $object->getId();
+                },
+                ObjectNormalizer::GROUPS => ['user:light', 'flux:light']
+            ]
+        );;
     }
 
     #[IsGranted('ROLE_USER')]
@@ -53,7 +68,7 @@ class UserFluxesController extends AbstractController
             }
 
             return $this->json([
-                'status' => 'error',
+                'status' => 400,
                 'errors' => $error_message
             ], 400);
         }
