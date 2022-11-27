@@ -37,7 +37,7 @@ class UserFluxesController extends AbstractController
                 },
                 ObjectNormalizer::GROUPS => ['user:light', 'flux:light']
             ]
-        );;
+        );
     }
 
     #[IsGranted('ROLE_USER')]

@@ -55,9 +55,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:full')]
     private Collection $created_fluxes;
 
+    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Article::class)]
+    private Collection $createdArticles;
+
     public function __construct()
     {
         $this->created_fluxes = new ArrayCollection();
+        $this->createdArticles = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -166,6 +170,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($createdFlux->getCreatedBy() === $this) {
                 $createdFlux->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Article>
+     */
+    public function getCreatedArticles(): Collection
+    {
+        return $this->createdArticles;
+    }
+
+    public function addCreatedArticle(Article $createdArticle): self
+    {
+        if (!$this->createdArticles->contains($createdArticle)) {
+            $this->createdArticles->add($createdArticle);
+            $createdArticle->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedArticle(Article $createdArticle): self
+    {
+        if ($this->createdArticles->removeElement($createdArticle)) {
+            // set the owning side to null (unless already changed)
+            if ($createdArticle->getCreatedBy() === $this) {
+                $createdArticle->setCreatedBy(null);
             }
         }
 
