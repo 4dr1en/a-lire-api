@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Entity\Flux;
+use App\Service\FetchPageMetas;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,22 +47,31 @@ class UserArticlesController extends AbstractController
         Request $request,
         ValidatorInterface $validator,
         ManagerRegistry $doctrine,
+        FetchPageMetas $fetchPageMetas
     ): JsonResponse {
         $req = json_decode($request->getContent(), true);
         $user = $this->getUser();
 
         $article = new Article();
-        if (isset($req['url'])) {
-            $article->setUrl($req['url'] ?: '');
-        }
         if (isset($req['title'])) {
             $article->setTitle($req['title'] ?: '');
         }
         if (isset($req['description'])) {
             $article->setDescription($req['description'] ?: '');
         }
-        if (isset($req['thumbnail'])) {
-            $article->setThumbnail($req['thumbnail'] ?: '');
+        if (isset($req['url'])) {
+            $article->setUrl($req['url'] ?: '');
+            $metas = $fetchPageMetas->get($req['url']);
+
+            if (isset($metas['title'])) {
+                $article->setTitle($metas['title']);
+            }
+            if (isset($metas['description'])) {
+                $article->setDescription($metas['description']);
+            }
+            if (isset($metas['thumbnail'])) {
+                $article->setThumbnail($metas['thumbnail']);
+            }
         }
         if (isset($req['flux'])) {
             $flux = $doctrine->getRepository(Flux::class)->find($req['flux']);
