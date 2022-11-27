@@ -23,6 +23,7 @@ class Article
         maxMessage: 'The title cannot be longer than {{ limit }} characters'
     )]
     #[Assert\Url]
+    #[Groups('article:light')]
     private ?string $url = null;
 
     #[ORM\Column(length: 255)]
@@ -70,7 +71,6 @@ class Article
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
-    //#[Assert\Valid]
     #[Groups('article:light')]
     private ?flux $belongTo = null;
 

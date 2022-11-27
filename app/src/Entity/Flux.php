@@ -61,6 +61,7 @@ class Flux
     private ?string $slug = null;
 
     #[ORM\OneToMany(mappedBy: 'belongTo', targetEntity: Article::class, orphanRemoval: true)]
+    #[Groups('flux:full')]
     private Collection $articles;
 
     public function __construct()

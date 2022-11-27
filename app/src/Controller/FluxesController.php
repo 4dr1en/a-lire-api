@@ -37,6 +37,7 @@ class FluxesController extends AbstractController
 
         return $this->json(
             [
+                'status' => 200,
                 'flux' => $flux,
             ],
             200,
@@ -45,7 +46,7 @@ class FluxesController extends AbstractController
                 ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
                     return $object->getId();
                 },
-                ObjectNormalizer::GROUPS => ['flux:light', 'flux:full', 'user:light'],
+                ObjectNormalizer::GROUPS => ['flux:light', 'flux:full', 'user:light', 'article:light'],
             ]
         );
     }
