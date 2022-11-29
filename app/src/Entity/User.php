@@ -56,12 +56,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $created_fluxes;
 
     #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Article::class)]
+    #[Groups('user:articles')]
     private Collection $createdArticles;
+
+    #[ORM\OneToMany(mappedBy: 'written_by', targetEntity: Comment::class)]
+    #[Groups('user:comments')]
+    private Collection $writtenComments;
 
     public function __construct()
     {
         $this->created_fluxes = new ArrayCollection();
         $this->createdArticles = new ArrayCollection();
+        $this->writtenComments = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -200,6 +206,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($createdArticle->getCreatedBy() === $this) {
                 $createdArticle->setCreatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getWrittenComments(): Collection
+    {
+        return $this->writtenComments;
+    }
+
+    public function addWrittenComment(Comment $writtenComment): self
+    {
+        if (!$this->writtenComments->contains($writtenComment)) {
+            $this->writtenComments->add($writtenComment);
+            $writtenComment->setWrittenBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWrittenComment(Comment $writtenComment): self
+    {
+        if ($this->writtenComments->removeElement($writtenComment)) {
+            // set the owning side to null (unless already changed)
+            if ($writtenComment->getWrittenBy() === $this) {
+                $writtenComment->setWrittenBy(null);
             }
         }
 

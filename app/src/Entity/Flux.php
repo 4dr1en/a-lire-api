@@ -60,7 +60,7 @@ class Flux
     #[Groups('flux:light')]
     private ?string $slug = null;
 
-    #[ORM\OneToMany(mappedBy: 'belongTo', targetEntity: Article::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'belong_to', targetEntity: Article::class, orphanRemoval: true)]
     #[Groups('flux:full')]
     private Collection $articles;
 

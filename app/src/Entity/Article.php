@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ArticleRepository;
@@ -65,14 +67,23 @@ class Article
     #[Groups('article:full')]
     private ?\DateTimeImmutable $moderated_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'createdArticles')]
+    #[ORM\ManyToOne(inversedBy: 'created_articles')]
     #[Groups('article:full')]
     private ?user $created_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('article:light')]
-    private ?flux $belongTo = null;
+    private ?flux $belong_to = null;
+
+    #[ORM\OneToMany(mappedBy: 'belong_to_article', targetEntity: Comment::class, orphanRemoval: true)]
+    #[Groups('article:full')]
+    private Collection $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -189,12 +200,42 @@ class Article
 
     public function getBelongTo(): ?flux
     {
-        return $this->belongTo;
+        return $this->belong_to;
     }
 
-    public function setBelongTo(?flux $belongTo): self
+    public function setBelongTo(?flux $belong_to): self
     {
-        $this->belongTo = $belongTo;
+        $this->belong_to = $belong_to;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setBelongToArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getBelongToArticle() === $this) {
+                $comment->setBelongToArticle(null);
+            }
+        }
 
         return $this;
     }

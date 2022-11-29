@@ -13,7 +13,7 @@ class FetchPageMetas
 		$this->client = $client;
 	}
 
-	public function get(string $url) //: array
+	public function get(string $url): array
 	{
 		$urlResponse = $this->fetch($url);
 		return $this->extractMetas($urlResponse);
@@ -29,7 +29,7 @@ class FetchPageMetas
 		} else throw new Exception('Error while fetching page metas');
 	}
 
-	protected function extractMetas(string $response) //: array
+	protected function extractMetas(string $response): array
 	{
 		$htmlDocument = new DOMDocument();
 		@$htmlDocument->loadHTML($response);

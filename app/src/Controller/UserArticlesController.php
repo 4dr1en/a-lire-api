@@ -24,7 +24,6 @@ class UserArticlesController extends AbstractController
         $user = $this->getUser();
         $articles = $user->getCreatedArticles();
 
-        // return the flux in json format
         return $this->json(
             [
                 'user' => $user,
@@ -107,7 +106,7 @@ class UserArticlesController extends AbstractController
 
         return $this->json(
             [
-                'status' => 201,
+                'status' => Response::HTTP_CREATED,
                 'article' => $article,
             ],
             Response::HTTP_CREATED,
