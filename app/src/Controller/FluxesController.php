@@ -30,14 +30,25 @@ class FluxesController extends AbstractController
         );
     }
 
-    #[Route('/fluxes/{id}', name: 'app_fluxs_show')]
-    public function show(FluxRepository $fluxRepository, int $id): JsonResponse
+    #[Route('/fluxes/{idOrSlug<\w+>}', name: 'app_fluxs_show')]
+    public function show(FluxRepository $fluxRepository, string $idOrSlug): JsonResponse
     {
-        $flux = $fluxRepository->find($id);
+        $typeOfSearch = 'slug';
+        if (ctype_digit($idOrSlug)) {
+            $flux = $fluxRepository->find((int) $id);
+            if ( type_of($flux) === 'Flux') {
+                $typeOfSearch = 'id';
+            }
+        } 
+        
+        if($typeOfSearch === 'slug') {
+            $flux = $fluxRepository->findOneBy(['slug' => $idOrSlug]);
+        }
 
         return $this->json(
             [
                 'status' => 200,
+                'searchType' => $typeOfSearch,
                 'flux' => $flux,
             ],
             200,
