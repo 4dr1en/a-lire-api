@@ -69,12 +69,12 @@ class Article
 
     #[ORM\ManyToOne(inversedBy: 'created_articles')]
     #[Groups('article:full')]
-    private ?user $created_by = null;
+    private ?User $created_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('article:light')]
-    private ?flux $belong_to = null;
+    private ?Flux $belong_to = null;
 
     #[ORM\OneToMany(mappedBy: 'belong_to_article', targetEntity: Comment::class, orphanRemoval: true)]
     #[Groups('article:full')]
@@ -186,24 +186,24 @@ class Article
         return $this;
     }
 
-    public function getCreatedBy(): ?user
+    public function getCreatedBy(): ?User
     {
         return $this->created_by;
     }
 
-    public function setCreatedBy(?user $created_by): self
+    public function setCreatedBy(?User $created_by): self
     {
         $this->created_by = $created_by;
 
         return $this;
     }
 
-    public function getBelongTo(): ?flux
+    public function getBelongTo(): ?Flux
     {
         return $this->belong_to;
     }
 
-    public function setBelongTo(?flux $belong_to): self
+    public function setBelongTo(?Flux $belong_to): self
     {
         $this->belong_to = $belong_to;
 

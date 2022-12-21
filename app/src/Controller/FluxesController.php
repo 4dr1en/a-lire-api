@@ -45,20 +45,30 @@ class FluxesController extends AbstractController
             $flux = $fluxRepository->findOneBy(['slug' => $idOrSlug]);
         }
 
+        if( $flux !== null ){
+            return $this->json(
+                [
+                    'status' => 200,
+                    'searchType' => $typeOfSearch,
+                    'flux' => $flux,
+                ],
+                200,
+                [],
+                [
+                    ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                        return $object->getId();
+                    },
+                    ObjectNormalizer::GROUPS => ['flux:light', 'flux:full', 'user:light', 'article:light'],
+                ]
+            );
+        }
+
         return $this->json(
             [
-                'status' => 200,
-                'searchType' => $typeOfSearch,
-                'flux' => $flux,
+                'status' => 404,
+                'message' => 'Flux not found',
             ],
-            200,
-            [],
-            [
-                ObjectNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
-                    return $object->getId();
-                },
-                ObjectNormalizer::GROUPS => ['flux:light', 'flux:full', 'user:light', 'article:light'],
-            ]
+            404
         );
     }
 }

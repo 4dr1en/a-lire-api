@@ -46,16 +46,16 @@ class Comment
 
     #[ORM\ManyToOne(inversedBy: 'written_comments')]
     #[Groups('comment:light')]
-    private ?user $written_by = null;
+    private ?User $written_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('comment:full')]
-    private ?article $belong_to_article = null;
+    private ?Article $belong_to_article = null;
 
     #[ORM\ManyToOne]
     #[Groups('comment:light')]
-    private ?comment $parent_comment = null;
+    private ?Comment $parent_comment = null;
 
     public function __construct()
     {
@@ -127,36 +127,36 @@ class Comment
         return $this;
     }
 
-    public function getWrittenBy(): ?user
+    public function getWrittenBy(): ?User
     {
         return $this->written_by;
     }
 
-    public function setWrittenBy(?user $written_by): self
+    public function setWrittenBy(?User $written_by): self
     {
         $this->written_by = $written_by;
 
         return $this;
     }
 
-    public function getBelongToArticle(): ?article
+    public function getBelongToArticle(): ?Article
     {
         return $this->belong_to_article;
     }
 
-    public function setBelongToArticle(?article $belong_to_article): self
+    public function setBelongToArticle(?Article $belong_to_article): self
     {
         $this->belong_to_article = $belong_to_article;
 
         return $this;
     }
 
-    public function getParentComment(): ?comment
+    public function getParentComment(): ?Comment
     {
         return $this->parent_comment;
     }
 
-    public function setParentComment(?comment $parent_comment): self
+    public function setParentComment(?Comment $parent_comment): self
     {
         $this->parent_comment = $parent_comment;
 
