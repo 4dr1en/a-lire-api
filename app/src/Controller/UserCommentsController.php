@@ -55,7 +55,7 @@ class UserCommentsController extends AbstractController
 
         $entityManager = $doctrine->getManager();
 
-        if (isset($req['article'])) {
+        if (!empty($req['article'])) {
             $comment->setBelongToArticle(
                 $entityManager->getReference(Article::class, $req['article'])
             );

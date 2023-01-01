@@ -76,7 +76,7 @@ class Article
     #[Groups('article:light')]
     private ?Flux $belong_to = null;
 
-    #[ORM\OneToMany(mappedBy: 'belong_to_article', targetEntity: Comment::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'belong_to_article', targetEntity: Comment::class, orphanRemoval: true, fetch:"LAZY")]
     #[Groups('article:full')]
     private Collection $comments;
 

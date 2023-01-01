@@ -51,6 +51,9 @@ class Comment
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('comment:full')]
+    #[Assert\NotBlank(
+        message: 'A comment must be related to an Article'
+    )]
     private ?Article $belong_to_article = null;
 
     #[ORM\ManyToOne]

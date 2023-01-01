@@ -51,7 +51,7 @@ class Flux
     #[Groups('flux:full')]
     private ?\DateTimeImmutable $updated_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'created_fluxes')]
+    #[ORM\ManyToOne(inversedBy: 'created_fluxes', fetch:"LAZY")]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups('flux:full')]
     private ?User $created_by = null;
@@ -60,7 +60,7 @@ class Flux
     #[Groups('flux:light')]
     private ?string $slug = null;
 
-    #[ORM\OneToMany(mappedBy: 'belong_to', targetEntity: Article::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'belong_to', targetEntity: Article::class, orphanRemoval: true, fetch:"LAZY")]
     #[Groups('flux:full')]
     private Collection $articles;
 

@@ -51,15 +51,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:light')]
     private ?string $email = null;
 
-    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Flux::class)]
+    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Flux::class, fetch:"LAZY")]
     #[Groups('user:full')]
     private Collection $created_fluxes;
 
-    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Article::class)]
+    #[ORM\OneToMany(mappedBy: 'created_by', targetEntity: Article::class, fetch:"LAZY")]
     #[Groups('user:articles')]
     private Collection $createdArticles;
 
-    #[ORM\OneToMany(mappedBy: 'written_by', targetEntity: Comment::class)]
+    #[ORM\OneToMany(mappedBy: 'written_by', targetEntity: Comment::class, fetch:"LAZY")]
     #[Groups('user:comments')]
     private Collection $writtenComments;
 
